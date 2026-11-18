@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f8">
+  <meta name="description" content="拖动两只基金的资金配比，比较100万元在截图所列11个月的复利收益、月度表现与历史回撤。">
+  <title>组合实验室 · 双基金配比回测</title>
+  <style>
+:root{--bg:#f5f6f8;--paper:#fff;--ink:#192c36;--muted:#73828b;--line:#e6eaee;--accent:#14695e;--accent-soft:#eaf4f0;--a:#647eb2;--a-soft:#f1f4fa;--b:#c78a4d;--b-soft:#fbf5ec;--loss:#b75b52;--positive:#136e60;--shadow:0 2px 8px #1a2b3b03;--radius:17px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input,select{font:inherit}button,a,select,input[type=range],summary{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible,svg [tabindex]:focus-visible{outline:3px solid #5fa99b;outline-offset:4px}button{border:0}button:disabled{opacity:.45;cursor:not-allowed}input[type=number]{appearance:textfield;-moz-appearance:textfield}input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none}h1,h2,p{margin:0}h2{font-size:16px;font-weight:650;letter-spacing:-.3px}strong{font-weight:650}.topbar{height:86px;padding:0 4.2%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:var(--paper)}.brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:650;line-height:1.35;letter-spacing:.2px}.brand-mark{display:grid;place-items:center;width:37px;height:37px;border-radius:11px;background:var(--accent);color:white;font-size:30px;font-weight:400;transform:rotate(-18deg)}.brand small{display:block;font-size:9px;letter-spacing:2.3px;color:var(--muted);font-weight:500;margin-top:3px}.top-right{display:flex;gap:9px;align-items:center;font-size:12px;color:var(--muted)}.status-dot{width:6px;height:6px;border-radius:50%;background:#63a48c;display:inline-block;flex-shrink:0}.top-right .button{margin-left:17px}.page{max-width:1490px;margin:0 auto;padding:38px 4.2% 20px}.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:30px}.eyebrow{font-size:10px;font-weight:650;letter-spacing:1.6px;color:var(--accent);margin-bottom:9px}h1{font-size:35px;line-height:1.45;letter-spacing:-1.1px;font-weight:650}.intro p{color:var(--muted);font-size:13px;margin-top:10px}.mobile-break{display:none}.period-badge{display:flex;gap:9px;align-items:center;font-size:12px;white-space:nowrap;padding-bottom:3px}.badge-light{font-size:10px;color:var(--muted);padding:3px 7px;background:#e9edf0;border-radius:5px;margin-left:6px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.workspace{display:grid;grid-template-columns:302px minmax(0,1fr);gap:23px;align-items:start}.control-panel{padding:24px 23px;position:sticky;top:18px}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.step-label{font-size:9px;letter-spacing:1px;color:#93a0a7}.field-label{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;margin-bottom:9px;gap:8px}.field-label>span{color:var(--muted);font-size:10px;font-weight:400}.money-input{display:flex;align-items:center;background:#f7f8fa;border:1px solid #e6e9ec;border-radius:9px;padding:8px 12px;gap:10px}.money-input>span:first-child{font-size:18px;color:var(--muted)}.money-input>span:last-child{color:var(--muted);font-size:12px}.money-input input{background:none;border:0;min-width:0;width:100%;outline:none;font-weight:650;font-size:23px;color:var(--ink);letter-spacing:-.6px}.quiet{color:var(--muted);font-size:11px;line-height:1.85}.amount-hint{margin:5px 0 22px}.fund-card{padding:14px 13px;border-radius:10px}.fund-a{background:var(--a-soft)}.fund-b{background:var(--b-soft);margin-top:16px}.fund-line{display:flex;gap:8px;align-items:center}.fund-tag{font-size:10px;width:20px;height:20px;display:inline-grid;place-items:center;border-radius:5px;font-weight:650;flex-shrink:0}.fund-tag.a{background:#dfe6f3;color:#536c9e}.fund-tag.b{background:#f2e6d5;color:#a87940}.fund-name{font-size:10px;letter-spacing:-.2px;font-weight:550}.allocation-line{display:flex;align-items:baseline;justify-content:space-between;margin-top:11px}.allocation-line strong{font-size:28px;letter-spacing:-.7px;line-height:1.2}.allocation-line strong span{font-size:14px;margin-left:3px;font-weight:500}.allocation-line>span{font-size:12px;color:var(--muted)}.slider-head{margin-top:19px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--muted)}.slider-head output{color:var(--ink);font-size:11px;font-weight:600}input[type=range]{--fill:75.5%;width:100%;margin:13px 0 0;height:6px;border-radius:99px;appearance:none;-webkit-appearance:none;background:linear-gradient(to right,var(--a) 0 var(--fill),#e4e8ed var(--fill) 100%);touch-action:pan-y;display:block}input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:21px;height:21px;border:4px solid white;border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px #d8e2df,0 2px 6px #24493830}input[type=range]::-moz-range-thumb{width:13px;height:13px;border:4px solid white;border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px #d8e2df,0 2px 6px #24493830}.range-ends{display:flex;justify-content:space-between;margin-top:10px;color:var(--muted);font-size:9px}.preset-label{font-size:10px;color:var(--muted);margin:20px 0 9px}.preset-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #dfe5e8;border-radius:7px;padding:8px 12px;background:white;color:var(--ink);font-weight:500;font-size:11px;line-height:1.5;transition:background .15s,border-color .15s}.button:hover{border-color:#afc9c3;background:#f5faf8}.button.selected{border-color:#80b5a8;color:var(--accent);background:#eef7f3}.button.primary{background:var(--accent);border-color:var(--accent);color:white}.button.primary:hover{background:#105b51}.button.small{font-size:10px;padding:8px 12px}.divider{height:1px;background:var(--line);margin:23px 0 19px}select{width:100%;color:var(--ink);background:#f8f9fb;border:1px solid #e1e6ea;border-radius:7px;padding:10px 8px;font-size:10px;outline-offset:3px}.mode-note{font-size:10px;margin:9px 0 17px;line-height:1.8}.practical-note{border-left:2px solid #c99c65;margin-top:20px;padding:0 0 0 11px;font-size:10px;color:#826d50}.practical-note strong{font-size:10px}.practical-note p{margin-top:4px;line-height:1.9}.practical-note a{display:inline-block;margin-top:4px;text-decoration:underline;text-underline-offset:3px}.results{min-width:0}.results-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.results-title h2{font-size:13px;font-weight:550}.results-title>span{font-size:10px;color:var(--muted)}.metrics{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:11px;margin-bottom:20px}.metric{padding:18px 17px 16px;background:white;border:1px solid var(--line);border-radius:12px;min-width:0}.metric-label{display:block;color:var(--muted);font-size:10px;white-space:nowrap}.metric-label .unit{font-size:8px;margin-left:3px}.metric strong{font-size:29px;letter-spacing:-1px;display:block;margin:10px 0 3px;line-height:1.25;font-weight:600;white-space:nowrap}.metric strong>span{font-size:15px;margin-left:2px;font-weight:450}.metric-sub{font-size:9px;color:var(--muted);display:block;line-height:1.8}.metric-primary{background:var(--accent);color:white;border-color:var(--accent)}.metric-primary .metric-label{color:#d1e5de}.metric-primary .metric-sub{color:#d4e8e2}.chart-panel,.month-panel{padding:24px 25px 0;margin-bottom:20px;overflow:hidden}.section-heading p{margin-top:5px}.chart-heading{margin-bottom:13px}.segment{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:8px;background:#f7f8fa;flex-shrink:0}.segment button{padding:5px 13px;font-size:10px;color:var(--muted);border-radius:5px;background:transparent}.segment button.active{background:white;color:var(--ink);box-shadow:0 1px 4px #1b293615}.chart-legend{display:flex;align-items:center;justify-content:flex-end;gap:18px;margin-bottom:1px;font-size:9px;color:var(--muted)}.chart-legend>span{display:flex;gap:5px;align-items:center}.legend-line{display:inline-block;width:16px;height:2px;border-radius:2px}.legend-line.current{background:var(--accent);height:3px}.legend-line.a{background:var(--a)}.legend-line.b{background:var(--b)}.chart{display:block;width:100%;overflow:visible;user-select:none}.chart-wrap{margin-top:5px}.chart text{font-family:inherit;font-size:11px;fill:var(--muted);font-variant-numeric:tabular-nums}.chart .grid-line{stroke:#e9edf0;stroke-width:1;stroke-dasharray:3 5}.chart .axis-label{font-size:10px;fill:#8b989f}.chart .value-label{font-size:11px;font-weight:600}.chart .series{fill:none;stroke-linecap:round;stroke-linejoin:round}.chart .point{cursor:pointer;outline-offset:3px}.chart-reading{font-size:10px;text-align:center;color:var(--accent);min-height:24px;padding:2px 5px 8px}.chart-foot{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:11px 0;color:var(--muted);font-size:10px}.tiny-pill{font-size:9px;white-space:nowrap;border:1px solid var(--line);border-radius:6px;padding:4px 7px;color:var(--muted);align-self:flex-start}.month-panel{padding-bottom:8px}.month-panel .section-heading{margin-bottom:9px}.monthly-chart{margin:0 0 5px}.scroll-table{width:100%;overflow-x:auto;scrollbar-width:thin}table{border-collapse:collapse;white-space:nowrap;width:100%;font-size:10px;text-align:right}th{font-size:9px;color:var(--muted);font-weight:500;padding:10px 10px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}td{padding:9px 10px;border-bottom:1px solid #f0f2f4}th:first-child,td:first-child{text-align:left;padding-left:0}th:last-child,td:last-child{padding-right:0}.highlight-col{color:var(--accent)}.current-col{background:#f5faf7;font-weight:600;color:var(--accent)}.positive{color:var(--positive)}.negative{color:var(--loss)}.neutral{color:var(--muted)}.month-row.active td{background:#edf5f1}.explore-panel{padding:27px;margin-top:25px}.explore-panel .section-heading{margin-bottom:12px}.explore-panel h2{font-size:20px}.explore-grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:42px;align-items:center}.frontier-chart{margin-top:4px}.frontier-reading{font-size:10px;text-align:center;min-height:24px}.risk-box{padding:21px;background:#f7f9f8;border:1px solid #e5ebe8;border-radius:11px}.risk-box .field-label{font-size:12px}.risk-box output{font-size:18px;line-height:1;letter-spacing:-.5px;color:var(--accent)}.risk-box input{--fill:40%;margin:19px 0 0;background:linear-gradient(to right,#7fae9f 0 var(--fill),#dfe7e2 var(--fill) 100%)}.risk-box .quiet{font-size:10px;margin-top:14px}.risk-box .button{width:100%;margin-top:16px}.risk-pair{font-size:13px;font-weight:600;margin-top:17px}.risk-stats{display:flex;justify-content:space-between;margin-top:10px;font-size:10px;color:var(--muted)}.risk-stats strong{display:block;font-size:19px;line-height:1.4;color:var(--ink);margin-top:3px}.risk-empty{font-size:12px;color:#96714f;margin-top:19px}.compare-scroll{margin-top:22px}.compare-scroll table{font-size:12px}.compare-scroll th{font-size:10px}.compare-scroll td{padding-top:14px;padding-bottom:14px}.compare-scroll td:first-child{font-weight:550}.compare-scroll tr.selected-row{background:#f5faf7}.compare-scroll .button{font-size:10px;padding:5px 10px}.comparison-note{margin-top:12px;font-size:10px}.bottom-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:23px;margin:24px 0}.insight-panel,.oracle-panel{padding:26px}.bottom-grid h2{font-size:18px}.bottom-grid p{font-size:12px;line-height:1.95;color:var(--muted);margin-top:14px}.correlation-value{display:flex;gap:17px;align-items:center;margin-top:17px}.correlation-value strong{font-size:34px;letter-spacing:-1px;color:var(--accent);line-height:1.3}.correlation-value>span{font-size:10px;color:var(--muted)}.observation{border-top:1px solid var(--line);padding-top:15px;margin-top:18px;font-size:11px;line-height:1.9;color:#52666f}.oracle-number{font-size:31px;letter-spacing:-.8px;margin-top:11px;color:#6f7b87}.oracle-number>span{font-size:16px}.oracle-panel p.quiet{font-size:11px;margin-top:6px}.oracle-panel details{font-size:11px;margin-top:17px;border-top:1px solid var(--line);padding-top:12px}.oracle-panel summary{color:var(--muted)}.oracle-months{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}.oracle-months>span{font-size:10px;padding:6px;background:#f5f7f8;border-radius:5px}.methodology{padding:20px 25px}.methodology>details>summary{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;gap:10px}.methodology>details>summary::after{content:'＋';font-size:16px;color:var(--muted)}.methodology>details[open]>summary::after{content:'−'}.methodology>details>summary>span.quiet{font-weight:400;margin-left:auto;font-size:10px}.method-content{padding-top:21px;max-width:1000px}.method-content p{font-size:12px;color:var(--muted);line-height:1.9}.source-check{font-size:11px;margin:12px 0;color:#657781;background:#f7f9fa;padding:10px;border-radius:7px;line-height:1.9}.editor-table{max-width:580px;margin-top:15px}.editor-table td{padding:5px 10px}.editor-table input{border:1px solid #e0e6e9;border-radius:4px;padding:6px 8px;width:95px;text-align:right;color:var(--ink);background:white;font-size:11px}.editor-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.editor-actions span{font-size:11px;color:var(--accent)}.method-list{padding-left:17px;font-size:11px;line-height:1.9;color:var(--muted)}.method-list li{margin-top:8px}.method-list strong{color:#52656f}.source-links{font-size:10px!important}.source-links a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}footer{display:flex;justify-content:space-between;align-items:center;color:#99a4aa;font-size:10px;padding:25px 0 5px;gap:14px}.footer-slash{margin:0 8px;color:#c6cdd1}.error{font-size:10px;color:var(--loss);margin:6px 0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.chart [role=button]{cursor:pointer}.chart [role=button]:hover .chart-hit{fill:#14695e0b}.chart-dot-label{fill:var(--accent)!important}.data-modified{color:#b57b3e!important}.live-pulse{color:var(--accent)}
+@media(min-width:1600px){.page{padding-left:30px;padding-right:30px}.topbar{padding-left:max(4.2%,calc((100vw - 1430px)/2));padding-right:max(4.2%,calc((100vw - 1430px)/2))}}
+@media(max-width:1150px){.page{padding:29px 25px 18px}.topbar{padding:0 25px;height:75px}.workspace{grid-template-columns:274px minmax(0,1fr);gap:18px}.control-panel{padding:21px 18px}.metrics{gap:8px;grid-template-columns:1fr 1fr}.metric{padding:16px}.metric strong{font-size:28px}.metric-sub{font-size:9px}.chart-panel,.month-panel{padding-left:18px;padding-right:18px}.intro{align-items:flex-start}.period-badge{flex-wrap:wrap;justify-content:flex-end;max-width:240px;padding-top:15px;gap:7px}.period-badge .badge-light{margin-left:0}.explore-grid{grid-template-columns:minmax(0,1fr) 265px;gap:23px}.explore-panel{padding:23px}.chart text{font-size:12px}.chart .axis-label{font-size:11px}.chart .value-label{font-size:12px}}
+@media(max-width:850px){h1{font-size:29px}.workspace{grid-template-columns:245px minmax(0,1fr);gap:15px}.control-panel{padding:19px 15px}.fund-name{font-size:9px}.section-heading{gap:8px}.step-label{font-size:8px}.intro p{font-size:12px}.period-badge{font-size:10px;max-width:200px}.results-title h2{font-size:11px}.results-title>span{font-size:9px}.metric{padding:13px 11px}.metric strong{font-size:25px}.metric-label{font-size:9px}.metric-sub{font-size:8px}.chart-heading{align-items:flex-start}.chart-heading h2,.month-panel h2{font-size:14px}.chart-heading p{max-width:180px}.segment button{padding:4px 7px;font-size:9px}.chart-legend{gap:10px;font-size:8px}.chart text{font-size:14px}.chart .axis-label{font-size:13px}.chart .value-label{font-size:14px}.chart-foot{font-size:9px;gap:6px}.chart-reading{font-size:9px}.month-panel .tiny-pill{display:none}.explore-grid{grid-template-columns:minmax(0,1fr) 235px;gap:18px}.explore-panel h2{font-size:18px}.explore-panel .tiny-pill{display:none}.risk-box{padding:16px}.risk-box .field-label{font-size:11px}.bottom-grid{gap:16px}.bottom-grid h2{font-size:16px}.insight-panel,.oracle-panel{padding:21px}.correlation-value{flex-wrap:wrap;gap:6px}.oracle-months{grid-template-columns:1fr 1fr}}
+@media(max-width:670px){.topbar{height:70px;padding:0 18px}.brand{font-size:16px;gap:9px}.brand small{font-size:8px;letter-spacing:1.6px}.brand-mark{width:31px;height:31px;font-size:25px;border-radius:9px}.top-right>span{display:none}.top-right .button{margin:0;font-size:10px;padding:8px 10px}.page{padding:25px 16px 16px}.intro{display:block;margin-bottom:22px}.intro .eyebrow{font-size:9px}h1{font-size:29px;line-height:1.45}.intro p{font-size:11px;max-width:320px;margin-top:9px;line-height:1.9}.period-badge{max-width:none;justify-content:flex-start;padding-top:15px;font-size:10px}.period-badge .badge-light{margin-left:4px}.workspace{grid-template-columns:1fr;gap:23px}.control-panel{position:static;padding:21px}.control-panel .section-heading{margin-bottom:20px}.control-panel h2{font-size:17px}.step-label{font-size:9px}.field-label{font-size:12px}.money-input input{font-size:25px}.amount-hint{margin-bottom:18px}.fund-card{padding:14px 15px}.fund-name{font-size:12px}.allocation-line strong{font-size:30px}.allocation-line>span{font-size:13px}.slider-head{font-size:11px}.slider-head output{font-size:12px}input[type=range]{height:7px;margin-top:19px}input[type=range]::-webkit-slider-thumb{width:27px;height:27px;border-width:5px}input[type=range]::-moz-range-thumb{width:17px;height:17px;border-width:5px}.range-ends{font-size:10px;margin-top:14px}.fund-b{margin-top:17px}.preset-label{font-size:11px}.preset-buttons{grid-template-columns:repeat(4,1fr);gap:6px}.preset-buttons .button{font-size:10px;padding:9px 4px}.divider{margin:21px 0 18px}select{font-size:12px;padding:12px 9px}.mode-note{font-size:11px;margin-bottom:16px}.practical-note,.practical-note strong{font-size:10px}.results-title{margin-bottom:12px}.results-title h2{font-size:13px}.results-title>span{font-size:10px}.metrics{gap:10px;margin-bottom:17px}.metric{padding:17px}.metric strong{font-size:31px;margin:9px 0 5px}.metric-label{font-size:10px}.metric-sub{font-size:9px}.chart-panel,.month-panel{padding:21px 16px 0;margin-bottom:17px}.chart-heading h2,.month-panel h2{font-size:15px}.chart-heading p{max-width:200px;font-size:10px}.segment button{font-size:10px;padding:4px 9px}.chart-legend{margin-top:16px;margin-bottom:10px;font-size:9px;gap:14px;justify-content:flex-start}.chart text{font-size:21px}.chart .axis-label{font-size:18px}.chart .value-label{font-size:20px}.chart-reading{font-size:10px;line-height:1.8;padding:4px 2px 10px;min-height:44px;text-align:left}.chart-foot{font-size:9px;padding:10px 0;gap:8px;flex-wrap:wrap}.chart-foot>span{white-space:nowrap}.month-panel{padding-bottom:7px}.month-panel .section-heading p{font-size:10px;max-width:280px}.month-panel .section-heading{margin-bottom:12px}.monthly-chart{margin-bottom:9px}table{font-size:11px}th{font-size:10px;padding:10px 12px}td{padding:10px 12px}table{min-width:630px}.explore-panel{padding:21px 16px;margin-top:4px}.explore-panel h2{font-size:18px}.explore-panel .quiet{font-size:10px}.explore-panel .section-heading{margin-bottom:17px}.explore-grid{grid-template-columns:1fr;gap:20px}.frontier-chart{margin-top:4px}.frontier-chart text{font-size:15px}.frontier-chart .axis-label{font-size:15px}.frontier-chart .value-label{font-size:16px}.frontier-reading{min-height:36px;line-height:1.8}.risk-box{padding:20px}.risk-box .field-label{font-size:13px}.risk-box output{font-size:21px}.risk-box input{margin-top:22px}.risk-box .quiet{font-size:11px}.risk-pair{font-size:15px}.risk-stats{font-size:11px}.risk-stats strong{font-size:21px}.risk-box .button{padding:11px;font-size:12px}.compare-scroll{margin-top:23px}.compare-scroll table{min-width:700px;font-size:11px}.compare-scroll th{font-size:10px}.comparison-note{font-size:10px}.bottom-grid{grid-template-columns:1fr;gap:17px;margin:17px 0}.insight-panel,.oracle-panel{padding:23px 21px}.bottom-grid h2{font-size:18px}.bottom-grid p{font-size:12px}.correlation-value{flex-wrap:nowrap;gap:15px}.correlation-value>span{font-size:10px}.observation{font-size:11px}.oracle-months{grid-template-columns:repeat(3,1fr)}.methodology{padding:19px 17px}.methodology>details>summary{font-size:12px}.methodology>details>summary>span.quiet{display:none}.method-content p{font-size:11px}.editor-table{min-width:300px}.editor-actions .button{font-size:10px}.method-list{font-size:10px}footer{font-size:9px;line-height:1.9;align-items:flex-start}footer>span{max-width:55%}.footer-slash{margin:0 5px}.month-panel .chart text{font-size:20px}.month-panel .chart .value-label{font-size:19px}}
+@media(max-width:360px){.page{padding-left:12px;padding-right:12px}.fund-name{font-size:10px}.control-panel{padding:18px}.preset-buttons .button{font-size:9px}.metric{padding:14px}.metric strong{font-size:27px}.metric-label{font-size:9px}.chart-legend{gap:9px;font-size:8px}.segment button{padding:4px 7px}.correlation-value{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+.mobile-dock,.jump-to-months{display:none}.mobile-dock[hidden]{display:none!important}
+@media(max-width:670px){.mobile-break{display:block}body{padding-bottom:85px}.jump-to-months{display:block;text-align:center;color:var(--accent);font-size:11px;margin-top:14px}.month-panel{scroll-margin-top:16px}.mobile-dock{display:block;position:fixed;z-index:20;bottom:0;left:0;width:100%;padding:12px 24px calc(19px + env(safe-area-inset-bottom));background:#fffffff5;border-top:1px solid #dbe7e1;box-shadow:0 -4px 18px #192c3608;backdrop-filter:blur(14px)}.dock-labels{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)}.dock-labels strong{font-size:15px;color:var(--ink);margin-left:3px}.mobile-dock input[type=range]{margin-top:15px;height:6px}.mobile-dock input[type=range]::-webkit-slider-thumb{width:25px;height:25px}.mobile-dock input[type=range]::-moz-range-thumb{width:15px;height:15px}.mobile-dock .dock-labels label{cursor:pointer}}
+
+.month-data-note{font-size:9px;margin:10px 0 7px}
+
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="#main" class="brand"><span class="brand-mark" aria-hidden="true">◒</span><span>组合实验室<small>PORTFOLIO LAB</small></span></a>
+    <div class="top-right"><span class="status-dot"></span><span>基于你的两张收益截图</span><button class="button small" id="export-top">导出结果 <span aria-hidden="true">↗</span></button></div>
+  </header>
+
+  <main id="main" class="page">
+    <section class="intro">
+      <div><div class="eyebrow">双基金 / 历史配比回测</div><h1>让每一种配比，<br class="mobile-break">都有据可看。</h1><p>拖动资金比例，看看收益与波动如何变化。所有结果只描述这段历史。</p></div>
+      <div class="period-badge"><span class="status-dot"></span><span id="period-label">2026.01 — 2026.11</span><span class="badge-light" id="observations">11 个观察值</span></div>
+    </section>
+
+    <div class="workspace">
+      <aside class="panel control-panel" aria-label="配比设置">
+        <div class="section-heading"><h2>配置你的组合</h2><span class="step-label">01 / 配比</span></div>
+        <label class="field-label" for="capital">初始资金<span>人民币</span></label>
+        <div class="money-input"><span aria-hidden="true">¥</span><input id="capital" inputmode="decimal" type="number" min="1" max="100000000000" step="10000" value="1000000" aria-describedby="capital-hint"><span>元</span></div>
+        <div id="capital-hint" class="quiet amount-hint">100 万元</div>
+        <p id="capital-error" class="error" role="alert" hidden></p>
+
+        <div class="fund-card fund-a"><div class="fund-line"><span class="fund-tag a">A</span><span class="fund-name">磐松大盘股指数增强进取1号</span></div><div class="allocation-line"><strong id="a-weight">75.5<span>%</span></strong><span id="a-money">75.50 万元</span></div></div>
+        <div class="slider-head"><label for="weight">调整 A 的初始占比</label><output for="weight" id="weight-output">75.5%</output></div>
+        <input id="weight" class="allocation-slider" type="range" min="0" max="100" step="0.1" value="75.5" aria-label="磐松基金初始占比" aria-valuetext="磐松75.5%，华澄24.5%">
+        <div class="range-ends"><span>全部华澄 B</span><span>全部磐松 A</span></div>
+        <div class="fund-card fund-b"><div class="fund-line"><span class="fund-tag b">B</span><span class="fund-name">华澄二号</span></div><div class="allocation-line"><strong id="b-weight">24.5<span>%</span></strong><span id="b-money">24.50 万元</span></div></div>
+
+        <div class="preset-label">一键查看这段历史的配比</div>
+        <div class="preset-buttons"><button class="button" data-preset="drawdown">回撤最低</button><button class="button" data-preset="volatility">波动最低</button><button class="button" data-preset="return">收益最高</button><button class="button" data-preset="half">各投一半</button></div>
+        <a class="jump-to-months" href="#monthly-section">查看每月收益 ↓</a>
+
+        <div class="divider"></div>
+        <label class="field-label" for="mode">持有方式</label>
+        <select id="mode"><option value="hold">年初买入，一直持有</option><option value="rebalance">每月调回设定比例（理论模拟）</option></select>
+        <p class="quiet mode-note" id="mode-note">只在开始时按比例分配；之后两只基金的仓位随各自涨跌自然变化。</p>
+        <label class="field-label" for="period">回测区间</label>
+        <select id="period"><option value="11">1—11 月：使用全部截图数据</option><option value="10">1—10 月：排除 11 月观察值</option></select>
+        <p class="quiet mode-note">截图未注明截止日，11 月可能为月内收益。可切换区间观察结果是否稳定。</p>
+        <div class="practical-note"><strong>实际认购条件</strong><p>若为普通个人直接认购私募，单只通常至少 100 万元。100 万元拆分两只在此仅作数学模拟；还需核实资格、起投额与开放日。</p><a href="https://www.csrc.gov.cn/csrc/c106256/c1653981/content.shtml" target="_blank" rel="noopener noreferrer">查看证监会相关规定 ↗</a></div>
+      </aside>
+
+      <div class="results">
+        <div class="results-title"><h2>这笔钱，会怎样走过这段历史？</h2><span id="current-mode">买入持有</span></div>
+        <section class="metrics" aria-label="当前配比的回测指标" aria-live="polite" aria-atomic="true">
+          <article class="metric metric-primary"><span class="metric-label">期末总资产 <span class="unit">万元</span></span><strong id="end-value">113.60</strong><span class="metric-sub" id="total-profit">累计赚取 +13.60 万元</span></article>
+          <article class="metric"><span class="metric-label">区间累计收益</span><strong id="total-return">+13.60<span>%</span></strong><span class="metric-sub">逐期复利计算</span></article>
+          <article class="metric"><span class="metric-label">观察点最大回撤</span><strong id="max-dd">6.32<span>%</span></strong><span class="metric-sub">相对此前资产高点的最大降幅</span></article>
+          <article class="metric"><span class="metric-label">月收益波动</span><strong id="volatility">5.53<span>%</span></strong><span class="metric-sub">样本标准差 · 未年化</span></article>
+        </section>
+
+        <section class="panel chart-panel">
+          <div class="section-heading chart-heading"><div><h2>资金轨迹</h2><p class="quiet" id="curve-subtitle">初始 100 万元，沿每个月的收益向前走。</p></div><div class="segment" role="group" aria-label="图表类型"><button id="view-wealth" class="active" aria-pressed="true">总资产</button><button id="view-drawdown" aria-pressed="false">回撤</button></div></div>
+          <div class="chart-legend"><span><i class="legend-line current"></i>当前组合</span><span><i class="legend-line a"></i>全部磐松 A</span><span><i class="legend-line b"></i>全部华澄 B</span></div>
+          <div class="chart-wrap" id="wealth-wrap"><svg id="wealth-chart" class="chart" viewBox="0 0 880 290" role="img" aria-label="当前组合与两只基金单独持有的资金轨迹"></svg></div>
+          <div class="chart-reading" id="curve-reading" role="status">点击图中月份，查看当期资产与收益。</div>
+          <div class="chart-foot"><span id="worst-month">最差月份：11 月</span><span id="monthly-win">盈利观察值：6 / 11</span></div>
+        </section>
+
+        <section class="panel month-panel" id="monthly-section">
+          <div class="section-heading"><div><h2>每个月，赚了还是亏了？</h2><p class="quiet">组合收益率随滑块实时变化；柱状图保留正负号。</p></div><span class="tiny-pill">月收益率 %</span></div>
+          <svg id="monthly-chart" class="chart monthly-chart" viewBox="0 0 880 220" role="img" aria-label="组合每个月的收益率"></svg>
+          <div class="scroll-table"><table id="monthly-table"><caption class="sr-only">每月基金收益、组合收益、盈亏与期末资产</caption><thead><tr><th>月份</th><th class="highlight-col">当前组合</th><th>磐松 A</th><th>华澄 B</th><th>当月盈亏 / 元</th><th>期末资产 / 元</th><th>A 月初占比</th></tr></thead><tbody id="monthly-body"></tbody></table></div>
+          <p class="quiet month-data-note">* 11 月为截图观察值，截止日未知，可能尚未结束。表格可左右滑动。</p>
+        </section>
+      </div>
+    </div>
+
+    <section class="panel explore-panel">
+      <div class="section-heading"><div><div class="eyebrow">02 / 寻找取舍</div><h2>更少的回撤，还是更多的收益？</h2><p class="quiet">遍历 A 占比 0—100%，步长 0.1 个百分点。点击曲线选择配比。</p></div><span class="tiny-pill">同一区间 · 同一持有方式</span></div>
+      <div class="explore-grid"><div><svg id="frontier-chart" class="chart frontier-chart" viewBox="0 0 650 300" role="img" aria-label="不同配比的历史回撤与累计收益曲线"></svg><div id="frontier-reading" class="quiet frontier-reading">横轴越靠左，历史回撤越小；纵轴越高，历史收益越高。</div></div>
+        <div class="risk-box"><label class="field-label" for="risk-limit">按历史回撤上限筛选<output id="risk-output" for="risk-limit">10.0%</output></label><input id="risk-limit" type="range" min="0" max="25" step="0.1" value="10" aria-describedby="risk-explanation"><div class="range-ends"><span>0%</span><span>25%</span></div><p id="risk-explanation" class="quiet">在设定的历史回撤以内，寻找累计收益最高的配比。这个上限不约束未来亏损。</p><div id="risk-result"></div><button class="button primary" id="apply-risk">应用这个配比</button></div>
+      </div>
+      <div class="scroll-table compare-scroll"><table><caption class="sr-only">不同历史目标对应的最佳配比</caption><thead><tr><th>回测方案</th><th>磐松 A / 华澄 B</th><th>区间收益</th><th>观察点最大回撤</th><th>月收益波动</th><th>期末资产 / 万元</th><th></th></tr></thead><tbody id="comparison-body"></tbody></table></div>
+      <p class="quiet comparison-note">“收益最高”“回撤最低”“波动最低”均为用同一段已知历史筛出的结果，存在样本内拟合，不能据此判断未来最优。</p>
+    </section>
+
+    <section class="bottom-grid">
+      <article class="panel insight-panel"><div class="eyebrow">03 / 看懂结果</div><h2>两只混合，为什么可能更平稳？</h2><div class="correlation-value"><strong id="correlation">−0.196</strong><span>两只基金的样本月收益相关系数</span></div><p>这段历史里，两只基金并非总是同涨同跌。组合有时能互相抵消波动；但它们也会同时下跌，相关性还可能随市场变化。</p><div class="observation" id="insight-text"></div></article>
+      <article class="panel oracle-panel"><div class="eyebrow">额外视角 / 仅供对照</div><h2>如果每月都提前知道谁会赢？</h2><p>假设每个月开始前，就把全部资金放进当月表现更好的一只，不计换仓费用。</p><div class="oracle-number" id="oracle-return">+105.20<span>%</span></div><p class="quiet">这是使用未来信息的事后择优结果，需要提前知道每月输赢，无法照此在当时执行。它不参与配比优化，也不是交易建议。</p><details><summary>展开事后赢家与逐月收益</summary><div id="oracle-months" class="oracle-months"></div></details></article>
+    </section>
+
+    <section class="panel methodology">
+      <details><summary><span>数据与计算说明</span><span class="quiet">截图原始值可核对、修改</span></summary>
+        <div class="method-content"><p>只取两张截图中 2026 年“本基金”一行的 1—11 月收益，未使用指数收益或超额收益。原始值保留至小数点后两位；截图截止日未知，11 月可能尚未结束。</p><div id="source-check" class="source-check"></div>
+          <div class="scroll-table"><table class="editor-table"><caption class="sr-only">修改原始月收益率，单位为百分比</caption><thead><tr><th>月份</th><th>磐松 A / %</th><th>华澄 B / %</th></tr></thead><tbody id="data-editor"></tbody></table></div>
+          <div class="editor-actions"><button class="button primary" id="apply-data">使用修改后的数据</button><button class="button" id="reset-data">还原截图数据</button><span id="editor-status" role="status"></span></div>
+          <ul class="method-list"><li><strong>买入持有：</strong>初始分别投入 C×w 与 C×(1−w)，各自累计复利后相加。之后占比自然漂移，不能把初始占比直接用于每个月的组合收益。</li><li><strong>每月再平衡：</strong>每期初均恢复设定占比，组合当期收益为 w×rA+(1−w)×rB，再逐期复利。假设可按对应时点净值无摩擦成交；实际开放日、锁定期、申赎限制可能使其不可执行。</li><li><strong>观察点最大回撤：</strong>以初始时点、各月观察点的资金高点为基准，取之后最大的百分比下降。11 月按截图观察值处理。没有日度净值，无法得知期间内真正的最大回撤，实际可能更大。</li><li><strong>月收益波动：</strong>所选观察值收益率的样本标准差（n−1 分母），未年化；11 月若不完整，将影响可比性。</li><li><strong>费用与净值：</strong>未额外扣除个人申赎费用、税费或业绩报酬。截图收益是否已扣基金层面费用未知，应以合同与净值口径为准。</li><li><strong>可行范围：</strong>仅比较这两只基金、全额投入、无杠杆、不做空；不包含现金或其他资产。所谓“最低风险”仅指指定历史指标更低，并非保本或整体最优资产配置。</li><li><strong>使用边界：</strong>只有 10—11 个观察值，历史收益、相关性和筛选出的比例都可能不稳定；这些回测不预测未来收益。</li></ul>
+          <p class="source-links">参考：<a href="https://www.csrc.gov.cn/csrc/c106256/c1653981/content.shtml" target="_blank" rel="noopener noreferrer">证监会：私募投资基金监督管理暂行办法</a> · <a href="https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-47" target="_blank" rel="noopener noreferrer">SEC：历史表现与回测说明</a></p>
+        </div>
+      </details>
+    </section>
+    <footer><span>组合实验室 <span class="footer-slash">/</span> 根据你提供的数据计算</span><span>数学模拟 · 不连接交易账户</span></footer>
+  </main>
+  <div class="mobile-dock" id="mobile-dock" hidden aria-label="随时调整资金配比">
+    <div class="dock-labels"><label for="weight-mobile">A 磐松 <strong id="dock-a">75.5%</strong></label><span>B 华澄 <strong id="dock-b">24.5%</strong></span></div>
+    <input id="weight-mobile" type="range" min="0" max="100" step="0.1" value="75.5" aria-label="调整配比：磐松基金初始占比">
+  </div>
+<script>
+(function (root) {
+  'use strict';
+  const ORIGINAL = Object.freeze({
+    a: Object.freeze([7.21, 2.96, -4.93, 10.89, -1.97, 0.49, -4.81, 9.76, -2.66, -11.10, -0.18]),
+    b: Object.freeze([11.90, -2.80, -0.38, 5.07, -4.08, 4.71, -1.83, 7.08, 12.87, 29.38, -17.47])
+  });
+
+  function validData(a, b) {
+    return Array.isArray(a) && Array.isArray(b) && a.length === 11 && b.length === 11 &&
+      [...a, ...b].every(x => Number.isFinite(x) && x > -100 && x <= 10000);
+  }
+
+  function calculate(a, b, weight, mode = 'hold', count = 11) {
+    if (!validData(a, b) || !Number.isFinite(weight) || weight < 0 || weight > 100 ||
+        !['hold', 'rebalance'].includes(mode) || ![10, 11].includes(count)) {
+      throw new Error('Invalid portfolio inputs');
+    }
+    const w = weight / 100;
+    let hA = w, hB = 1 - w, peak = 1, peakIndex = 0, maxDD = 0, ddStart = 0, ddEnd = 0;
+    const nav = [1], drawdowns = [0], rows = [];
+    for (let i = 0; i < count; i++) {
+      const before = hA + hB;
+      const wAStart = hA / before;
+      hA *= 1 + a[i] / 100;
+      hB *= 1 + b[i] / 100;
+      const total = hA + hB;
+      const ret = total / before - 1;
+      if (total > peak) { peak = total; peakIndex = i + 1; }
+      const dd = 1 - total / peak;
+      if (dd > maxDD) { maxDD = dd; ddStart = peakIndex; ddEnd = i + 1; }
+      nav.push(total);
+      drawdowns.push(dd);
+      rows.push({month: i + 1, a: a[i] / 100, b: b[i] / 100, ret, nav: total,
+        delta: total - before, wAStart, wAEnd: hA / total, drawdown: dd});
+      if (mode === 'rebalance') { hA = total * w; hB = total * (1 - w); }
+    }
+    const mean = rows.reduce((s, r) => s + r.ret, 0) / count;
+    const volatility = Math.sqrt(rows.reduce((s, r) => s + (r.ret - mean) ** 2, 0) / (count - 1));
+    const worst = rows.reduce((best, r) => r.ret < best.ret ? r : best, rows[0]);
+    return {weight, mode, count, nav, drawdowns, rows, totalReturn: nav[count] - 1, maxDD,
+      volatility, worst, positiveCount: rows.filter(r => r.ret > 0).length, ddStart, ddEnd};
+  }
+
+  function grid(a, b, mode, count) {
+    const points = [];
+    for (let i = 0; i <= 1000; i++) points.push(calculate(a, b, i / 10, mode, count));
+    return points;
+  }
+
+  function optimize(points) {
+    let maxReturn = points[0], minDD = points[0], minVolatility = points[0];
+    for (const p of points) {
+      if (p.totalReturn > maxReturn.totalReturn) maxReturn = p;
+      if (p.maxDD < minDD.maxDD - 1e-12 ||
+          (Math.abs(p.maxDD - minDD.maxDD) <= 1e-12 && p.totalReturn > minDD.totalReturn)) minDD = p;
+      if (p.volatility < minVolatility.volatility - 1e-12 ||
+          (Math.abs(p.volatility - minVolatility.volatility) <= 1e-12 && p.totalReturn > minVolatility.totalReturn)) minVolatility = p;
+    }
+    return {maxReturn, minDD, minVolatility};
+  }
+
+  function underRisk(points, cap) {
+    let winner = null;
+    for (const p of points) if (p.maxDD <= cap + 1e-12 && (!winner || p.totalReturn > winner.totalReturn)) winner = p;
+    return winner;
+  }
+
+  function correlation(a, b, count) {
+    const aMean = a.slice(0, count).reduce((s, r) => s + r, 0) / count;
+    const bMean = b.slice(0, count).reduce((s, r) => s + r, 0) / count;
+    let cov = 0, varA = 0, varB = 0;
+    for (let i = 0; i < count; i++) { cov += (a[i] - aMean) * (b[i] - bMean); varA += (a[i] - aMean) ** 2; varB += (b[i] - bMean) ** 2; }
+    return varA > 0 && varB > 0 ? cov / Math.sqrt(varA * varB) : null;
+  }
+
+  function oracle(a, b, count) {
+    let value = 1;
+    const rows = [];
+    for (let i = 0; i < count; i++) { const r = Math.max(a[i], b[i]); value *= 1 + r / 100; rows.push({month: i + 1, winner: a[i] >= b[i] ? 'A' : 'B', ret: r / 100}); }
+    return {totalReturn: value - 1, rows};
+  }
+
+  const api = {ORIGINAL, validData, calculate, grid, optimize, underRisk, correlation, oracle};
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.FundEngine = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+(function () {
+  'use strict';
+  const E = window.FundEngine;
+  const $ = id => document.getElementById(id);
+  const COLORS = {current: '#14695e', a: '#8399bd', b: '#c28b54', positive: '#408b77', negative: '#c07870'};
+  const state = {capital: 1000000, weight: 75.5, mode: 'hold', count: 11, a: [...E.ORIGINAL.a], b: [...E.ORIGINAL.b],
+    view: 'wealth', riskCap: 10, custom: false};
+  try {
+    const stored = JSON.parse(localStorage.getItem('fund-lab-v1') || 'null');
+    if (stored && E.validData(stored.a, stored.b) && stored.capital > 0 && stored.capital <= 1e11 &&
+        stored.weight >= 0 && stored.weight <= 100 && ['hold', 'rebalance'].includes(stored.mode) &&
+        [10, 11].includes(stored.count) && stored.riskCap >= 0 && stored.riskCap <= 25) {
+      Object.assign(state, stored, {view: 'wealth'});
+    }
+  } catch (_) { /* Browser storage is optional. */ }
+  let points, best, selected, soloA, soloB, riskChoice, activeMonth = null, frontierCandidate = null;
+  const fmt = (x, digits = 2) => Number(x).toLocaleString('zh-CN', {minimumFractionDigits: digits, maximumFractionDigits: digits});
+  const pct = (x, signed = false, digits = 2) => {
+    const value = Math.abs(x) < 0.00000001 ? 0 : x * 100;
+    const precision = value !== 0 && Math.abs(value) < .005 && digits === 2 ? 3 : digits;
+    return `${signed && value > 0 ? '+' : ''}${fmt(value, precision)}%`;
+  };
+  const wFmt = w => fmt(w, Number.isInteger(w) ? 0 : 1);
+  const moneyWan = x => `${fmt(x / 10000)} 万元`;
+  const cls = x => x > 1e-12 ? 'positive' : x < -1e-12 ? 'negative' : 'neutral';
+  const save = () => { try { localStorage.setItem('fund-lab-v1', JSON.stringify(state)); } catch (_) {} };
+  const periodName = () => `2026 年 1—${state.count} 月（${state.count === 11 ? '11 月按截图时点' : '排除11月'}）`;
+
+  function refreshGrid() {
+    points = E.grid(state.a, state.b, state.mode, state.count);
+    best = E.optimize(points);
+    soloA = points[1000]; soloB = points[0];
+  }
+
+  function setWeight(weight) {
+    state.weight = Math.max(0, Math.min(100, Math.round(weight * 10) / 10));
+    $('weight').value = state.weight;
+    $('weight-mobile').value = state.weight;
+    activeMonth = null;
+    save(); render();
+  }
+
+  function initControls() {
+    $('capital').value = state.capital;
+    $('weight').value = state.weight;
+    $('mode').value = state.mode;
+    $('period').value = state.count;
+    $('risk-limit').value = state.riskCap;
+  }
+
+  function render() {
+    selected = E.calculate(state.a, state.b, state.weight, state.mode, state.count);
+    $('a-weight').innerHTML = `${wFmt(state.weight)}<span>%</span>`;
+    $('b-weight').innerHTML = `${wFmt(100 - state.weight)}<span>%</span>`;
+    $('a-money').textContent = moneyWan(state.capital * state.weight / 100);
+    $('b-money').textContent = moneyWan(state.capital * (1 - state.weight / 100));
+    $('weight-output').value = `${wFmt(state.weight)}%`;
+    $('weight-mobile').value = state.weight;
+    $('weight-mobile').style.setProperty('--fill', `${state.weight}%`);
+    $('weight-mobile').setAttribute('aria-valuetext', `磐松${wFmt(state.weight)}%，华澄${wFmt(100 - state.weight)}%`);
+    $('dock-a').textContent = `${wFmt(state.weight)}%`;
+    $('dock-b').textContent = `${wFmt(100 - state.weight)}%`;
+    $('weight').style.setProperty('--fill', `${state.weight}%`);
+    $('weight').setAttribute('aria-valuetext', `磐松${wFmt(state.weight)}%，华澄${wFmt(100 - state.weight)}%`);
+    $('capital-hint').textContent = moneyWan(state.capital);
+    $('period-label').textContent = `2026.01 — 2026.${state.count}`;
+    $('period-label').classList.toggle('data-modified', state.custom);
+    $('observations').textContent = `${state.count} 个观察值${state.custom ? ' · 数据已修改' : ''}`;
+    $('current-mode').textContent = state.mode === 'hold' ? '买入持有' : '每月再平衡 · 理论';
+    $('mode-note').textContent = state.mode === 'hold'
+      ? '只在开始时按比例分配；之后两只基金的仓位随各自涨跌自然变化。'
+      : '每期初都恢复所设比例，假设可无摩擦成交；实际开放日、锁定期、起投额与申赎费用可能使其不可执行。';
+    $('end-value').textContent = fmt(state.capital * (1 + selected.totalReturn) / 10000);
+    $('total-profit').textContent = `累计${selected.totalReturn >= 0 ? '赚取' : '亏损'} ${selected.totalReturn > 0 ? '+' : ''}${moneyWan(state.capital * selected.totalReturn)}`;
+    $('total-return').innerHTML = `${selected.totalReturn > 0 ? '+' : ''}${fmt(selected.totalReturn * 100)}<span>%</span>`;
+    $('total-return').className = cls(selected.totalReturn);
+    $('max-dd').innerHTML = `${fmt(selected.maxDD * 100)}<span>%</span>`;
+    $('volatility').innerHTML = `${fmt(selected.volatility * 100)}<span>%</span>`;
+    $('curve-subtitle').textContent = `初始 ${moneyWan(state.capital)}，${state.count === 11 ? '11 月使用截图观察值' : '不含 11 月数据'}。`;
+    $('worst-month').textContent = `最差月份：${selected.worst.month} 月 ${pct(selected.worst.ret, true)}`;
+    $('monthly-win').textContent = `盈利观察值：${selected.positiveCount} / ${state.count}`;
+    document.querySelectorAll('[data-preset]').forEach(button => {
+      const weights = {drawdown: best.minDD.weight, volatility: best.minVolatility.weight, return: best.maxReturn.weight, half: 50};
+      const isSelected = Math.abs(state.weight - weights[button.dataset.preset]) < .01;
+      button.classList.toggle('selected', isSelected);
+      button.setAttribute('aria-pressed', String(isSelected));
+    });
+    renderWealth(); renderMonthly(); renderFrontier(); renderRisk(); renderComparison(); renderInsights(); renderSourceCheck();
+  }
+
+  function linePath(values, x, y) { return values.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(2)},${y(v).toFixed(2)}`).join(' '); }
+
+  function renderWealth() {
+    const svg = $('wealth-chart'), width = 880, height = 290;
+    const L = 65, R = 103, T = 27, B = 37, right = width - R, bottom = height - B;
+    const ddMode = state.view === 'drawdown';
+    const display = result => ddMode ? result.drawdowns.map(v => -100 * v) : result.nav.map(v => v * state.capital / 10000);
+    const cur = display(selected), a = display(soloA), b = display(soloB), all = [...cur, ...a, ...b];
+    let lo = Math.min(...all), hi = Math.max(...all), range = Math.max(hi - lo, ddMode ? 1 : state.capital / 100000);
+    lo -= range * .11; hi += range * .12;
+    if (ddMode) hi = Math.max(1, hi);
+    const x = i => L + i / state.count * (right - L), y = v => T + (hi - v) / (hi - lo) * (bottom - T);
+    let s = `<title>${ddMode ? '历史观察点回撤' : '资金轨迹'}：当前组合 ${pct(selected.totalReturn, true)}，最大回撤 ${pct(selected.maxDD)}</title><desc>当前组合与全部投资两只基金的对照。可点击月份或使用下方明细表。${periodName()}。</desc>`;
+    s += '<defs><linearGradient id="wealth-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#14695e" stop-opacity=".10"/><stop offset="100%" stop-color="#14695e" stop-opacity=".005"/></linearGradient></defs>';
+    s += `<text class="axis-label" x="${L}" y="13">${ddMode ? '回撤 / %' : '资产 / 万元'}</text>`;
+    for (let k = 0; k <= 4; k++) {
+      const value = lo + (hi - lo) * k / 4, yy = y(value);
+      s += `<line class="grid-line" x1="${L}" x2="${right}" y1="${yy}" y2="${yy}"/><text text-anchor="end" x="${L - 12}" y="${yy + 4}">${fmt(value, 1)}</text>`;
+    }
+    for (let i = 0; i <= state.count; i++) {
+      const narrow = window.innerWidth <= 850;
+      if (!narrow || i === 0 || i === state.count || i % 2 === 0)
+        s += `<text text-anchor="middle" x="${x(i)}" y="${height - 11}">${i ? i + '月' : '初始'}</text>`;
+    }
+    const base = ddMode ? y(0) : bottom;
+    s += `<path d="${linePath(cur, x, y)} L${right},${base} L${L},${base}Z" fill="url(#wealth-area)"/>`;
+    if (!ddMode) s += `<line x1="${L}" x2="${right}" y1="${y(state.capital / 10000)}" y2="${y(state.capital / 10000)}" stroke="#b4c0c7" stroke-width="1" stroke-dasharray="2 5"/>`;
+    s += `<path class="series" d="${linePath(a, x, y)}" stroke="${COLORS.a}" stroke-width="2" stroke-dasharray="5 5"/><path class="series" d="${linePath(b, x, y)}" stroke="${COLORS.b}" stroke-width="2" stroke-dasharray="9 4"/><path class="series" d="${linePath(cur, x, y)}" stroke="${COLORS.current}" stroke-width="3.5"/>`;
+    s += `<text class="value-label chart-dot-label" x="${right + 10}" y="${y(cur[state.count]) + 4}">${ddMode ? fmt(cur[state.count]) + '%' : fmt(cur[state.count])}</text>`;
+    s += `<line id="month-guide" x1="0" x2="0" y1="${T}" y2="${bottom}" stroke="#7ca69d" stroke-dasharray="3 4" visibility="hidden"/>`;
+    for (let i = 0; i <= state.count; i++) {
+      const half = (right - L) / state.count / 2;
+      s += `<g role="button" tabindex="0" data-month="${i}" aria-label="${i ? i + '月' : '初始'}，组合${ddMode ? '回撤' : '资产'}${fmt(cur[i])}${ddMode ? '百分比' : '万元'}"><rect class="chart-hit" x="${Math.max(L, x(i) - half)}" y="${T}" width="${i === 0 || i === state.count ? half : half * 2}" height="${bottom - T}" fill="transparent"/><circle cx="${x(i)}" cy="${y(cur[i])}" r="${i === state.count ? 5 : 3}" fill="${COLORS.current}" stroke="white" stroke-width="2"/></g>`;
+    }
+    svg.innerHTML = s;
+    svg.dataset.left = L; svg.dataset.right = right; svg.dataset.top = T; svg.dataset.bottom = bottom;
+    if (activeMonth !== null) readMonth(activeMonth);
+    else $('curve-reading').textContent = '点击曲线中的月份，查看当期资产、收益和回撤。';
+  }
+
+  function readMonth(index) {
+    index = Math.max(0, Math.min(state.count, index)); activeMonth = index;
+    const nav = selected.nav[index], ret = index ? selected.rows[index - 1].ret : 0;
+    const text = index ? `${index} 月${index === 11 ? '（截图时点）' : ''}：组合 ${pct(ret, true)} · 资产 ${moneyWan(nav * state.capital)} · 观察点回撤 ${pct(selected.drawdowns[index])}` : `初始：资产 ${moneyWan(state.capital)} · 磐松 ${wFmt(state.weight)}% / 华澄 ${wFmt(100 - state.weight)}%`;
+    $('curve-reading').textContent = text;
+    const guide = $('month-guide'), x = 65 + index / state.count * (880 - 103 - 65);
+    guide.setAttribute('x1', x); guide.setAttribute('x2', x); guide.setAttribute('visibility', 'visible');
+    document.querySelectorAll('.month-row').forEach(row => row.classList.toggle('active', Number(row.dataset.row) === index));
+  }
+
+  function renderMonthly() {
+    const width = 880, height = 220, L = 65, R = 24, T = 31, B = 34;
+    const values = selected.rows.map(r => r.ret * 100);
+    const maxAbs = Math.max(2, ...values.map(Math.abs));
+    const bound = Math.ceil(maxAbs / 5) * 5 + 3;
+    const top = T, bottom = height - B, mid = (top + bottom) / 2, y = v => mid - v / bound * (bottom - top) / 2;
+    const band = (width - L - R) / state.count, barW = Math.min(42, band * .53);
+    let s = '<title>当前组合逐月收益率</title><desc>正值盈利，负值亏损。精确数值及金额见下方表格。</desc>';
+    for (const value of [-Math.floor(bound / 5) * 5, 0, Math.floor(bound / 5) * 5]) {
+      s += `<line class="grid-line" x1="${L}" x2="${width - R}" y1="${y(value)}" y2="${y(value)}"/><text text-anchor="end" x="${L - 13}" y="${y(value) + 4}">${value}%</text>`;
+    }
+    selected.rows.forEach((r, i) => {
+      const v = r.ret * 100, x = L + band * (i + .5), yy = y(v), pos = v >= 0;
+      const labelY = pos ? yy - 9 : yy + 19;
+      const valueDigits = Math.abs(v) > 0 && Math.abs(v) < .005 ? 3 : Math.abs(v) < .05 ? 2 : 1;
+      s += `<g role="button" tabindex="0" class="point" data-month="${i + 1}" aria-label="${i + 1}月，组合收益${pct(r.ret, true)}"><rect x="${x - band / 2}" y="${T - 7}" width="${band}" height="${bottom - T + 10}" fill="transparent"/><rect x="${x - barW / 2}" y="${Math.min(mid, yy)}" width="${barW}" height="${Math.max(1.5, Math.abs(mid - yy))}" rx="3" fill="${pos ? COLORS.positive : COLORS.negative}"/><text class="value-label" text-anchor="middle" x="${x}" y="${labelY}" style="fill:${pos ? COLORS.positive : COLORS.negative}">${v > 0 ? '+' : ''}${fmt(v, valueDigits)}</text><text text-anchor="middle" x="${x}" y="${height - 8}">${i + 1}月</text></g>`;
+    });
+    $('monthly-chart').innerHTML = s;
+    $('monthly-body').innerHTML = selected.rows.map(r => `<tr class="month-row${activeMonth === r.month ? ' active' : ''}" data-row="${r.month}"><td>${r.month} 月${r.month === 11 ? '<span class="quiet"> *</span>' : ''}</td><td class="current-col ${cls(r.ret)}">${pct(r.ret, true)}</td><td class="${cls(r.a)}">${pct(r.a, true)}</td><td class="${cls(r.b)}">${pct(r.b, true)}</td><td class="${cls(r.delta)}">${r.delta > 0 ? '+' : ''}${fmt(r.delta * state.capital)}</td><td>${fmt(r.nav * state.capital)}</td><td>${pct(r.wAStart)}</td></tr>`).join('');
+  }
+
+  let frontierScale;
+  function renderFrontier() {
+    const W = 650, H = 300, L = 60, R = 29, T = 32, B = 48;
+    const maxDD = Math.max(...points.map(p => p.maxDD)) * 100;
+    const minRet = Math.min(...points.map(p => p.totalReturn)) * 100;
+    const maxRet = Math.max(...points.map(p => p.totalReturn)) * 100;
+    const xMax = Math.max(5, Math.ceil(maxDD / 5) * 5 + 2);
+    const lo = Math.floor(Math.min(0, minRet) / 10) * 10 - 2, hi = Math.ceil(Math.max(1, maxRet) / 10) * 10 + 4;
+    const x = v => L + v * 100 / xMax * (W - L - R), y = v => T + (hi - v * 100) / (hi - lo) * (H - T - B);
+    frontierScale = {x, y, W, H, L, R, T, B};
+    let s = `<title>1001 种配比的回撤与收益</title><desc>每个点代表一种初始配比。当前磐松占比${state.weight}%，累计收益${pct(selected.totalReturn)}，观察点最大回撤${pct(selected.maxDD)}。</desc><text class="axis-label" x="${L}" y="14">累计收益 / %</text>`;
+    for (let k = 0; k <= 4; k++) {
+      const v = lo + (hi - lo) * k / 4, yy = y(v / 100);
+      s += `<line class="grid-line" x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}"/><text text-anchor="end" x="${L - 10}" y="${yy + 4}">${fmt(v, 0)}</text>`;
+    }
+    for (let k = 0; k <= 4; k++) {
+      const v = xMax * k / 4;
+      s += `<text text-anchor="middle" x="${x(v / 100)}" y="${H - B + 21}">${fmt(v, 1)}</text>`;
+    }
+    s += `<text class="axis-label" text-anchor="middle" x="${(W + L - R) / 2}" y="${H - 3}">观察点最大回撤 / %</text>`;
+    s += `<path class="series" d="${points.map((p, i) => `${i ? 'L' : 'M'}${x(p.maxDD).toFixed(2)},${y(p.totalReturn).toFixed(2)}`).join(' ')}" stroke="#9db9af" stroke-width="2.5"/>`;
+    for (let i = 0; i <= 1000; i += 100) s += `<circle cx="${x(points[i].maxDD)}" cy="${y(points[i].totalReturn)}" r="3" fill="white" stroke="#98b3aa" stroke-width="1.5"/>`;
+    s += `<rect x="${x(best.minDD.maxDD) - 4}" y="${y(best.minDD.totalReturn) - 4}" width="8" height="8" rx="1" fill="#9db9af"/>`;
+    s += `<text x="${x(soloB.maxDD) - 7}" y="${y(soloB.totalReturn) - 13}" text-anchor="end" class="value-label" style="fill:${COLORS.b}">全投 B</text><text x="${x(soloA.maxDD) + 7}" y="${y(soloA.totalReturn) + 20}" class="value-label" style="fill:${COLORS.a}">全投 A</text>`;
+    s += `<circle cx="${x(selected.maxDD)}" cy="${y(selected.totalReturn)}" r="10" fill="#14695e12"/><circle cx="${x(selected.maxDD)}" cy="${y(selected.totalReturn)}" r="5" fill="${COLORS.current}" stroke="white" stroke-width="2"/>`;
+    s += `<rect data-frontier="true" tabindex="0" role="slider" aria-label="磐松初始占比；左右键每次调整0.1个百分点，或点击曲线选择配比" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${state.weight}" aria-valuetext="磐松${state.weight}%，华澄${wFmt(100 - state.weight)}%" x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent"/>`;
+    $('frontier-chart').innerHTML = s;
+    $('frontier-reading').textContent = `当前：磐松 ${wFmt(state.weight)}% / 华澄 ${wFmt(100 - state.weight)}% · 收益 ${pct(selected.totalReturn, true)} · 回撤 ${pct(selected.maxDD)}`;
+  }
+
+  function closestFrontier(event) {
+    const rect = $('frontier-chart').getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width * 650, py = (event.clientY - rect.top) / rect.height * 300;
+    let candidate = points[0], minDistance = Infinity;
+    for (const p of points) {
+      const d = (frontierScale.x(p.maxDD) - px) ** 2 + (frontierScale.y(p.totalReturn) - py) ** 2;
+      if (d < minDistance) { minDistance = d; candidate = p; }
+    }
+    return candidate;
+  }
+
+  function renderRisk() {
+    $('risk-output').value = `${fmt(state.riskCap, 1)}%`;
+    $('risk-limit').style.setProperty('--fill', `${state.riskCap * 4}%`);
+    riskChoice = E.underRisk(points, state.riskCap / 100);
+    $('apply-risk').disabled = !riskChoice;
+    if (!riskChoice) {
+      $('risk-result').innerHTML = `<div class="risk-empty">这两只基金的任意配比，都无法在这段历史里满足该上限。最低观察点回撤约为 ${pct(best.minDD.maxDD)}。</div>`;
+      return;
+    }
+    $('risk-result').innerHTML = `<div class="risk-pair">磐松 ${wFmt(riskChoice.weight)}% / 华澄 ${wFmt(100 - riskChoice.weight)}%</div><div class="risk-stats"><span>区间累计收益<strong>${pct(riskChoice.totalReturn, true)}</strong></span><span>观察点最大回撤<strong>${pct(riskChoice.maxDD)}</strong></span></div>`;
+  }
+
+  function renderComparison() {
+    const half = points[500];
+    const cases = [ ['收益最高', best.maxReturn], ['观察点回撤最低', best.minDD], ['月收益波动最低', best.minVolatility], ['各投一半', half], ['全部磐松 A', soloA], ['全部华澄 B', soloB] ];
+    $('comparison-body').innerHTML = cases.map(([label, p]) => `<tr class="${Math.abs(p.weight - state.weight) < .01 ? 'selected-row' : ''}"><td>${label}</td><td>${wFmt(p.weight)}% / ${wFmt(100 - p.weight)}%</td><td class="${cls(p.totalReturn)}">${pct(p.totalReturn, true)}</td><td>${pct(p.maxDD)}</td><td>${pct(p.volatility)}</td><td>${fmt(state.capital * (1 + p.totalReturn) / 10000)}</td><td><button class="button" data-apply-weight="${p.weight}" aria-label="应用${label}配比，磐松占比${p.weight}%">${Math.abs(p.weight - state.weight) < .01 ? '当前配比' : '查看配比'}</button></td></tr>`).join('');
+  }
+
+  function renderInsights() {
+    const c = E.correlation(state.a, state.b, state.count);
+    $('correlation').textContent = c === null ? '不适用' : fmt(c, 3);
+    const last = state.count - 1;
+    $('insight-text').textContent = `全投 A 的观察点最大回撤为 ${pct(soloA.maxDD)}，全投 B 为 ${pct(soloB.maxDD)}；当前组合为 ${pct(selected.maxDD)}。${state.count} 月，A 收益 ${pct(state.a[last] / 100, true)}、B 收益 ${pct(state.b[last] / 100, true)}。${state.count === 11 ? '11 月仅代表截图截止时点。' : ''}`;
+    const oracle = E.oracle(state.a, state.b, state.count);
+    $('oracle-return').innerHTML = `${oracle.totalReturn > 0 ? '+' : ''}${fmt(oracle.totalReturn * 100)}<span>%</span>`;
+    $('oracle-months').innerHTML = oracle.rows.map(r => `<span>${r.month} 月 · ${r.winner === 'A' ? '磐松 A' : '华澄 B'}<br>${pct(r.ret, true)}</span>`).join('');
+  }
+
+  function renderSourceCheck() {
+    const values = [E.calculate(state.a, state.b, 100, 'hold', 11).totalReturn, E.calculate(state.a, state.b, 0, 'hold', 11).totalReturn];
+    $('source-check').textContent = state.custom
+      ? `当前使用你修改的月度数据：A 的 11 期复利收益 ${pct(values[0])}，B 为 ${pct(values[1])}。上方回测按所选区间计算。`
+      : `核对：截图累计收益为 A 3.45%、B 44.85%；按展示的 11 个月四舍五入数值复利重算为 A ${pct(values[0])}、B ${pct(values[1])}，存在小幅尾差。本页面统一使用逐月复利重算值，不强行对齐截图累计值。11 月数据截止日未知。`;
+  }
+
+  function renderEditor() {
+    $('data-editor').innerHTML = state.a.map((value, i) => `<tr><td>${i + 1} 月</td><td><input type="number" step="0.01" min="-99.99" max="10000" value="${value.toFixed(2)}" id="data-a-${i}" aria-label="${i + 1}月磐松基金收益率，百分比"></td><td><input type="number" step="0.01" min="-99.99" max="10000" value="${state.b[i].toFixed(2)}" id="data-b-${i}" aria-label="${i + 1}月华澄基金收益率，百分比"></td></tr>`).join('');
+  }
+
+  function exportCSV() {
+    const lines = [
+      ['双基金配比历史回测', periodName()], ['持有方式', state.mode === 'hold' ? '年初买入后一直持有' : '每月再平衡（假设无摩擦成交）'],
+      ['初始资金/元', state.capital], ['磐松初始占比/%', state.weight], ['华澄初始占比/%', +(100 - state.weight).toFixed(1)],
+      ['区间累计收益/%', (selected.totalReturn * 100).toFixed(8)], ['观察点最大回撤/%', (selected.maxDD * 100).toFixed(8)], ['月收益样本标准差/%', (selected.volatility * 100).toFixed(8)],
+      ['提示', '11月可能不完整；仅使用月度观察点；历史配比优化不能预测未来；未额外扣除申赎税费、交易成本和业绩报酬；私募认购门槛与开放日可能使模拟不可执行。'], [],
+      ['月份', '磐松月收益/%', '华澄月收益/%', '组合月收益/%', '当月盈亏/元', '期末资产/元', '观察点回撤/%', 'A月初占比/%'],
+      ...selected.rows.map(r => [`2026-${String(r.month).padStart(2, '0')}`, (r.a * 100).toFixed(2), (r.b * 100).toFixed(2), (r.ret * 100).toFixed(8), (r.delta * state.capital).toFixed(2), (r.nav * state.capital).toFixed(2), (r.drawdown * 100).toFixed(8), (r.wAStart * 100).toFixed(6)])
+    ];
+    const csv = '\uFEFF' + lines.map(row => row.map(v => `"${String(v).replaceAll('"', '""')}"`).join(',')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8;'}));
+    const anchor = document.createElement('a'); anchor.href = url; anchor.download = `fund-backtest-A${state.weight}-${state.mode}-${state.count}months.csv`; document.body.appendChild(anchor); anchor.click(); anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
+  $('weight').addEventListener('input', event => setWeight(Number(event.target.value)));
+  $('weight-mobile').addEventListener('input', event => setWeight(Number(event.target.value)));
+  $('capital').addEventListener('input', event => {
+    const value = Number(event.target.value);
+    if (!Number.isFinite(value) || value <= 0 || value > 1e11) {
+      $('capital-error').textContent = '请输入大于 0、不超过 1000 亿元的有效金额。'; $('capital-error').hidden = false;
+      $('capital').setAttribute('aria-invalid', 'true'); return;
+    }
+    $('capital-error').hidden = true; $('capital').removeAttribute('aria-invalid');
+    state.capital = value; save(); render();
+  });
+  $('mode').addEventListener('change', event => {state.mode = event.target.value; activeMonth = null; refreshGrid(); save(); render();});
+  $('period').addEventListener('change', event => {state.count = Number(event.target.value); activeMonth = null; refreshGrid(); save(); render();});
+  $('risk-limit').addEventListener('input', event => {state.riskCap = Number(event.target.value); save(); renderRisk();});
+  $('apply-risk').addEventListener('click', () => {if (riskChoice) setWeight(riskChoice.weight);});
+  $('view-wealth').addEventListener('click', () => changeView('wealth'));
+  $('view-drawdown').addEventListener('click', () => changeView('drawdown'));
+  function changeView(view) {
+    state.view = view;
+    for (const type of ['wealth', 'drawdown']) { $('view-' + type).classList.toggle('active', type === view); $('view-' + type).setAttribute('aria-pressed', String(type === view)); }
+    renderWealth();
+  }
+  document.addEventListener('click', event => {
+    const preset = event.target.closest('[data-preset]');
+    if (preset) { const values = {drawdown: best.minDD.weight, volatility: best.minVolatility.weight, return: best.maxReturn.weight, half: 50}; setWeight(values[preset.dataset.preset]); }
+    const apply = event.target.closest('[data-apply-weight]'); if (apply) setWeight(Number(apply.dataset.applyWeight));
+    const month = event.target.closest('[data-month]'); if (month) readMonth(Number(month.dataset.month));
+  });
+  document.addEventListener('keydown', event => {
+    const month = event.target.closest('[data-month]');
+    if (month && ['Enter', ' '].includes(event.key)) {event.preventDefault(); readMonth(Number(month.dataset.month));}
+    if (event.target.matches('[data-frontier]') && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      const weight = event.key === 'Home' ? 0 : event.key === 'End' ? 100 : state.weight + (event.key === 'ArrowRight' ? .1 : -.1);
+      setWeight(weight); $('frontier-chart').querySelector('[data-frontier]').focus();
+    }
+  });
+  $('wealth-chart').addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse') return;
+    const rect = event.currentTarget.getBoundingClientRect(), xx = (event.clientX - rect.left) / rect.width * 880;
+    if (xx >= 65 && xx <= 777) readMonth(Math.round((xx - 65) / (777 - 65) * state.count));
+  });
+  $('frontier-chart').addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse') return;
+    frontierCandidate = closestFrontier(event);
+    $('frontier-reading').textContent = `预览：磐松 ${wFmt(frontierCandidate.weight)}% / 华澄 ${wFmt(100 - frontierCandidate.weight)}% · 收益 ${pct(frontierCandidate.totalReturn, true)} · 回撤 ${pct(frontierCandidate.maxDD)}`;
+  });
+  $('frontier-chart').addEventListener('click', event => {if (event.target.closest('[data-frontier]')) setWeight(closestFrontier(event).weight);});
+  $('frontier-chart').addEventListener('pointerleave', () => {$('frontier-reading').textContent = `当前：磐松 ${wFmt(state.weight)}% / 华澄 ${wFmt(100 - state.weight)}% · 收益 ${pct(selected.totalReturn, true)} · 回撤 ${pct(selected.maxDD)}`;});
+  $('export-top').addEventListener('click', exportCSV);
+  $('apply-data').addEventListener('click', () => {
+    const a = [], b = [];
+    for (let i = 0; i < 11; i++) {
+      for (const [name, target] of [['a', a], ['b', b]]) {
+        const field = $(`data-${name}-${i}`), raw = field.value.trim(), value = Number(raw);
+        if (!raw || !Number.isFinite(value) || value <= -100 || value > 10000) { $('editor-status').textContent = '每项收益率须大于 -100%、不超过 10000%，且不能为空。'; field.focus(); return; }
+        target.push(value);
+      }
+    }
+    state.a = a; state.b = b;
+    state.custom = [...a, ...b].some((v, i) => v !== [...E.ORIGINAL.a, ...E.ORIGINAL.b][i]);
+    activeMonth = null; refreshGrid(); save(); render();
+    $('editor-status').textContent = '已按修改后的数据重算。';
+  });
+  $('reset-data').addEventListener('click', () => {
+    state.a = [...E.ORIGINAL.a]; state.b = [...E.ORIGINAL.b]; state.custom = false; activeMonth = null;
+    refreshGrid(); renderEditor(); save(); render(); $('editor-status').textContent = '已还原两张截图中的原始月收益。';
+  });
+  let resizeTimer;
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      const entry = entries[0]; $('mobile-dock').hidden = entry.isIntersecting || entry.boundingClientRect.top >= 0;
+    });
+    observer.observe($('weight'));
+  }
+  window.addEventListener('resize', () => {clearTimeout(resizeTimer); resizeTimer = setTimeout(() => {renderWealth(); renderMonthly(); renderFrontier();}, 100);});
+  refreshGrid(); initControls(); renderEditor(); render();
+})();
+
+</script>
+</body>
+</html>
